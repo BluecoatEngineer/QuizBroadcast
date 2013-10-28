@@ -1,0 +1,141 @@
+<RelativeLayout
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="#000000"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/question_number"
+        android:id="@+id/labelQuestionNumber"
+        android:layout_gravity="center"
+        android:singleLine="false"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:textColor="#708bff"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/questionText"
+        android:layout_gravity="center"
+        android:text="@string/question_text"
+        android:textAlignment="gravity"
+        android:gravity="left"
+        android:layout_below="@+id/labelQuestionNumber"
+        android:layout_alignParentLeft="true"
+        android:textColor="#ffffff" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="false"
+        android:layout_below="@+id/questionText"
+        android:layout_marginTop="36dp"
+        android:layout_alignParentTop="false"
+        android:layout_alignWithParentIfMissing="false"
+        android:layout_alignParentBottom="false"
+        android:layout_alignParentLeft="false">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="16dp">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/answer_a"
+                android:id="@+id/buttonAnswer_a"
+                android:textColor="#ffffff"
+                android:layout_weight=".5" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/answer_b"
+                android:id="@+id/buttonAnswer_b"
+                android:textColor="#ffffff"
+                android:layout_weight=".5" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/answer_c"
+                android:id="@+id/buttonAnswer_c"
+                android:textColor="#ffffff"
+                android:layout_weight=".5" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/answer_d"
+                android:id="@+id/buttonAnswer_d"
+                android:textColor="#ffffff"
+                android:layout_weight=".5" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/relativeLayout">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/buttonHintText"
+            android:id="@+id/buttonHint"
+            android:layout_marginBottom="16dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="16dp"
+            android:textColor="#ffffff"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/labelScoreText"
+            android:id="@+id/labelScore"
+            android:layout_alignTop="@+id/buttonSkip"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp"
+            android:textColor="#ffffff" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/buttonSkipText"
+            android:id="@+id/buttonSkip"
+            android:layout_alignTop="@+id/buttonHint"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="16dp"
+            android:textColor="#ffffff"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/score_value"
+            android:id="@+id/labelScoreValue"
+            android:layout_below="@+id/labelScore"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="4dp"
+            android:textColor="#ffffff" />
+    </RelativeLayout>
+
+
+</RelativeLayout>
