@@ -5,6 +5,10 @@ import android.app.Activity;
 import android.view.Menu;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.TextView;
+
+import java.util.HashMap;
 
 public class QuizActivity extends Activity {
     private static final String TAG = "QuizGame";
@@ -23,6 +27,8 @@ public class QuizActivity extends Activity {
 
         /* Inflate our layout */
         setContentView(R.layout.activity_quiz);
+
+        this.testQuestion();
     }
 
 
@@ -31,6 +37,44 @@ public class QuizActivity extends Activity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.quiz, menu);
         return true;
+    }
+
+    void testQuestion() {
+        HashMap<QuestionEntries, String> questionMap;
+        Question testQuestion;
+
+        questionMap = new HashMap<QuestionEntries, String>();
+        questionMap.put(QuestionEntries.QUESTION,
+                "What is secured in a ship's cathead?");
+        questionMap.put(QuestionEntries.ANSWER_CORRECT,
+                "The anchor");
+        questionMap.put(QuestionEntries.ANSWER_WRONG_A,
+                "Ammunition");
+        questionMap.put(QuestionEntries.ANSWER_WRONG_B,
+                "Cat litter");
+        questionMap.put(QuestionEntries.ANSWER_WRONG_C,
+                "Tigers");
+
+        testQuestion = new Question(questionMap);
+
+        testQuestion.shuffleAnswers();
+
+        TextView questionText = (TextView) findViewById(R.id.questionText);
+        questionText.setText(testQuestion.getQuestionText());
+
+        TextView buttonResponse_a = (Button) findViewById(R.id.buttonResponse_a);
+        buttonResponse_a.setText(testQuestion.getResponseText(0));
+
+        TextView buttonResponse_b = (Button) findViewById(R.id.buttonResponse_b);
+        buttonResponse_b.setText(testQuestion.getResponseText(1));
+
+        TextView buttonResponse_c = (Button) findViewById(R.id.buttonResponse_c);
+        buttonResponse_c.setText(testQuestion.getResponseText(2));
+
+        TextView buttonResponse_d = (Button) findViewById(R.id.buttonResponse_d);
+        buttonResponse_d.setText(testQuestion.getResponseText(3));
+
+
     }
     
 }
