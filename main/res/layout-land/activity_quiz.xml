@@ -52,15 +52,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/answer_a"
-                android:id="@+id/buttonAnswer_a"
+                android:id="@+id/buttonResponse_a"
                 android:textColor="#ffffff"
-                android:layout_weight=".5" />
+                android:layout_weight=".5"
+                />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/answer_b"
-                android:id="@+id/buttonAnswer_b"
+                android:id="@+id/buttonResponse_b"
                 android:textColor="#ffffff"
                 android:layout_weight=".5" />
         </LinearLayout>
@@ -73,7 +74,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/answer_c"
-                android:id="@+id/buttonAnswer_c"
+                android:id="@+id/buttonResponse_c"
                 android:textColor="#ffffff"
                 android:layout_weight=".5" />
 
@@ -81,7 +82,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/answer_d"
-                android:id="@+id/buttonAnswer_d"
+                android:id="@+id/buttonResponse_d"
                 android:textColor="#ffffff"
                 android:layout_weight=".5" />
         </LinearLayout>
