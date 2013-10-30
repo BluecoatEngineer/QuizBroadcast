@@ -10,10 +10,10 @@
         Who cares! Just as long as it\'s our competitors who believe it and not the police.
     </string>
     <string name="question_number">Question #1</string>
-    <string name="answer_a">Answer_a</string>
-    <string name="answer_b">Answer_b</string>
-    <string name="answer_c">Answer_c</string>
-    <string name="answer_d">Answer_d</string>
+    <string name="response_a">Answer_a</string>
+    <string name="response_b">Answer_b</string>
+    <string name="response_c">Answer_c</string>
+    <string name="response_d">Answer_d</string>
     <string name="buttonHintText">Hint</string>
     <string name="labelScoreText">Score:</string>
     <string name="buttonSkipText">Skip</string>

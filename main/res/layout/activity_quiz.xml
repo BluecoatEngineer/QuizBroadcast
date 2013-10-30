@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="@string/question_number"
-        android:id="@+id/labelQuestionNumber"
+        android:id="@+id/questionNumber"
         android:layout_gravity="center"
         android:singleLine="false"
         android:layout_alignParentTop="true"
@@ -27,7 +27,7 @@
         android:text="@string/question_text"
         android:textAlignment="gravity"
         android:gravity="left"
-        android:layout_below="@+id/labelQuestionNumber"
+        android:layout_below="@+id/questionNumber"
         android:layout_alignParentLeft="true"
         android:textColor="#ffffff" />
 
@@ -40,7 +40,7 @@
         <Button
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/answer_a"
+            android:text="@string/response_a"
             android:id="@+id/buttonResponse_a"
             android:layout_marginBottom="4dp"
             android:layout_marginTop="32dp"
@@ -49,7 +49,7 @@
         <Button
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/answer_b"
+            android:text="@string/response_b"
             android:id="@+id/buttonResponse_b"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
@@ -58,7 +58,7 @@
         <Button
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/answer_c"
+            android:text="@string/response_c"
             android:id="@+id/buttonResponse_c"
             android:layout_marginBottom="4dp"
             android:layout_marginTop="4dp"
@@ -67,7 +67,7 @@
         <Button
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/answer_d"
+            android:text="@string/response_d"
             android:id="@+id/buttonResponse_d"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="32dp"
@@ -94,7 +94,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/labelScoreText"
-            android:id="@+id/labelScore"
+            android:id="@+id/scoreLabel"
             android:layout_alignTop="@+id/buttonSkip"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="8dp"
@@ -115,8 +115,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/score_value"
-            android:id="@+id/labelScoreValue"
-            android:layout_below="@+id/labelScore"
+            android:id="@+id/scoreValue"
+            android:layout_below="@+id/scoreLabel"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="4dp"
             android:textColor="#ffffff" />

@@ -3,6 +3,7 @@ package net.bradach.jack.quizgame;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 /**
  * Created by jack on 27/10/13.
@@ -20,10 +21,10 @@ public class QuestionDatabaseHelper extends SQLiteOpenHelper {
             "CREATE TABLE Questions (" +
             "id integer primary key," +
             "question test not null" +
-            "answer_correct not null" +
-            "answer_wrong_a not null" +
-            "answer_wrong_b" +
-            "answer_wrong_c" +
+            "response_correct not null" +
+            "response_wrong_a not null" +
+            "response_wrong_b" +
+            "response_wrong_c" +
             ");";
 
 
@@ -33,7 +34,16 @@ public class QuestionDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase database) {
+        return;
 
+    }
 
+    @Override
+    public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
+        Log.w(QuestionDatabaseHelper.class.getName(),
+            "Upgrading question database from version " + oldVersion +"->" + newVersion);
+
+        database.execSQL("DROP TABLE IF EXISTS Questions");
+        onCreate(database);
     }
 }
