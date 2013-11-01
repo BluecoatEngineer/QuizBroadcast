@@ -1,5 +1,6 @@
 package net.bradach.jack.quizgame;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.app.Activity;
 import android.util.Log;
@@ -29,20 +30,34 @@ public class QuizActivity extends Activity {
     private Button buttonSkip;
 
     /* Game variables */
-    private Integer quizScore = 0;
-    private Integer questionNumber = 1;
+    private Integer quizLength;
+    private Integer quizScore;
+    private Integer questionNumber;
     private Question quizQuestion;
 
     /* List of questions.  The skip button goes
     * to the next one, but does not mark it as answered.*/
     private ArrayList<Question> questionSet;
 
+    private boolean abort_quiz = false;
 
+    private static final Integer DEFAULT_QUIZ_LENGTH = 10;
+    private static final Integer DEFAULT_QUIZ_SCORE = 0;
+    private static final Integer DEFAULT_QUESTION_NUMBER = 1;
+
+    private static final String BUNDLE_QUESTION_NUMBER = "net.bradach.jack.quizgame.QUESTION_NUMBER";
+    private static final String BUNDLE_QUIZ_SCORE = "net.bradach.jack.quizgame.QUIZ_SCORE";
+    private static final String BUNDLE_QUIZ_LENGTH = "net.bradach.jack.quizgame.QUIZ_LENGTH";
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        /* Unpack any extras that may have come with the bundle. */
+        quizLength = getIntent().getIntExtra(BUNDLE_QUIZ_LENGTH, DEFAULT_QUIZ_LENGTH);
+        quizScore = getIntent().getIntExtra(BUNDLE_QUIZ_SCORE, DEFAULT_QUIZ_SCORE);
+        questionNumber = getIntent().getIntExtra(BUNDLE_QUESTION_NUMBER, DEFAULT_QUESTION_NUMBER);
 
         /* Set the layout to be fullscreen with no title bar.  This "should" be able to
          * be done in the XML style, but it doesn't seem to be of an inclination to honor
@@ -73,8 +88,34 @@ public class QuizActivity extends Activity {
         buttonResponse_c.setOnClickListener(responseOnClick);
         buttonResponse_d.setOnClickListener(responseOnClick);
 
+        /* The 'Skip' button takes us to the next question but
+         * does not mark this one as incorrect.  The player can
+         * come back to the question later.
+         */
+        buttonSkip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                questionNumber++;
+                Intent i = new Intent(QuizActivity.this, QuizActivity.class);
+                i.putExtra(BUNDLE_QUIZ_LENGTH, quizLength);
+                i.putExtra(BUNDLE_QUIZ_SCORE, quizScore);
+                i.putExtra(BUNDLE_QUESTION_NUMBER, questionNumber);
+                startActivity(i);
+                finish();
+            }
+        });
 
+        /*
+        quizQuestion.shuffleResponses();
+        textViewQuestionNumber.setText("Question #" + questionNumber);
+        textViewQuestionText.setText(quizQuestion.getQuestionText());
+        buttonResponse_a.setText(quizQuestion.getResponseText(0));
+        buttonResponse_b.setText(quizQuestion.getResponseText(1));
+        buttonResponse_c.setText(quizQuestion.getResponseText(2));
+        buttonResponse_d.setText(quizQuestion.getResponseText(3));
 
+        textViewScoreValue.setText(quizScore.toString());
+        */
         testQuestion();
     }
 
@@ -127,7 +168,9 @@ public class QuizActivity extends Activity {
         public void onClick(View v) {
             int responseNum = -1;
 
-        /* Figure out what button got hit */
+        /* Figure out what button got hit.  There's no default case
+         * because all possibilities are being covered in the switch.
+         */
             switch (v.getId()) {
                 case (R.id.buttonResponse_a):
                     responseNum = 0;
@@ -141,9 +184,6 @@ public class QuizActivity extends Activity {
                 case (R.id.buttonResponse_d):
                     responseNum = 3;
                     break;
-
-                default:
-                    Log.e(TAG, "Unknown clicked!");
             }
 
             if (quizQuestion.isResponseCorrect(responseNum)) {
@@ -151,6 +191,14 @@ public class QuizActivity extends Activity {
                 questionNumber++;
             }
 
+            /* Turn off all the response buttons */
+            buttonResponse_a.setEnabled(false);
+            buttonResponse_b.setEnabled(false);
+            buttonResponse_c.setEnabled(false);
+            buttonResponse_d.setEnabled(false);
+
+            /* Change 'skip' to 'next' to suggest what they should do */
+            buttonSkip.setText("Next");
             /*
               if (questionNumber < 10)
                 this->nextQuestion();
@@ -159,20 +207,42 @@ public class QuizActivity extends Activity {
             */
 
 
-            quizQuestion.shuffleResponses();
-            textViewQuestionNumber.setText("Question #" + questionNumber);
-            textViewQuestionText.setText(quizQuestion.getQuestionText());
-            buttonResponse_a.setText(quizQuestion.getResponseText(0));
-            buttonResponse_b.setText(quizQuestion.getResponseText(1));
-            buttonResponse_c.setText(quizQuestion.getResponseText(2));
-            buttonResponse_d.setText(quizQuestion.getResponseText(3));
 
-            textViewScoreValue.setText(quizScore.toString());
 
         }
     };
 
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        /* Play the slide change sound clip as we leave */
+        Globals.soundPool.play(1, 1, 1, 0, 0, 1);
+
+        /* If we hit 'skip', advance from right to left.  If we hit back, we're going back
+        * to the main menu so we want to go back to the main menu.
+        */
+        if (abort_quiz == true) {
+            this.overridePendingTransition(R.anim.animation_slideright_newactivity, R.anim.animation_slideright_oldactivity);
+        } else {
+            this.overridePendingTransition(R.anim.animation_slideleft_newactivity, R.anim.animation_slideleft_oldactivity);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        /* TODO: Add a 'back twice to exit,' with a toast.*/
+        abort_quiz = true;
+        finish();
+
+    }
+
+    private void nextQuestion() {
+        questionNumber++;
+
+
+    }
 
 
 
