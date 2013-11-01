@@ -4,11 +4,9 @@
     <string name="app_name">QuizGame</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
-    <string name="question_text">
-        The game has changed. The word is out. And you... are a killer. Apparently it\'s all over
+    <string name="question_text">        The game has changed. The word is out. And you... are a killer. Apparently it\'s all over
         town. Somebody crossed you, you got angry, you crushed their skull with an ATM machine.
-        Who cares! Just as long as it\'s our competitors who believe it and not the police.
-    </string>
+        Who cares! Just as long as it\'s our competitors who believe it and not the police.</string>
     <string name="question_number">Question #1</string>
     <string name="response_a">Answer_a</string>
     <string name="response_b">Answer_b</string>
@@ -18,4 +16,8 @@
     <string name="labelScoreText">Score:</string>
     <string name="buttonSkipText">Skip</string>
     <string name="score_value">0</string>
+    <string name="title_activity_menu">MenuActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+
 </resources>
