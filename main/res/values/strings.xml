@@ -14,10 +14,12 @@
     <string name="response_d">Answer_d</string>
     <string name="buttonHintText">Hint</string>
     <string name="labelScoreText">Score:</string>
-    <string name="buttonSkipText">Skip</string>
+    <string name="buttonSkipText">Skip Question</string>
     <string name="score_value">0</string>
     <string name="title_activity_menu">MenuActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="toast_db_not_loaded">Not enough questions in database for quiz!
+        Reload database before starting!</string>
 
 </resources>

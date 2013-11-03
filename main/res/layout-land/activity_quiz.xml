@@ -31,90 +31,111 @@
         android:layout_alignParentLeft="true"
         android:textColor="#ffffff" />
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:id="@+id/relativeLayoutResponseButtons"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="false"
         android:layout_below="@+id/questionText"
-        android:layout_marginTop="36dp"
-        android:layout_alignParentTop="false"
-        android:layout_alignWithParentIfMissing="false"
-        android:layout_alignParentBottom="false"
-        android:layout_alignParentLeft="false">
+        android:layout_centerHorizontal="true"
+        android:layout_margin="16dp">
 
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="16dp">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/response_a"
+            android:id="@+id/buttonResponse_a"
+            android:textColor="#ffffff"
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/response_a"
-                android:id="@+id/buttonResponse_a"
-                android:textColor="#ffffff"
-                android:layout_weight=".5"
-                />
+            android:layout_alignParentTop="false"
+            android:layout_alignParentLeft="false"
+            android:width="256dp"
+            android:layout_marginBottom="16dp"
+            android:height="64dp" />
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/response_b"
-                android:id="@+id/buttonResponse_b"
-                android:textColor="#ffffff"
-                android:layout_weight=".5" />
-        </LinearLayout>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/response_b"
+            android:id="@+id/buttonResponse_b"
+            android:textColor="#ffffff"
 
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
+            android:layout_alignParentRight="true"
+            android:width="256dp"
+            android:layout_marginBottom="16dp"
+            android:height="64dp" />
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/response_c"
-                android:id="@+id/buttonResponse_c"
-                android:textColor="#ffffff"
-                android:layout_weight=".5" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/response_c"
+            android:id="@+id/buttonResponse_c"
+            android:textColor="#ffffff"
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/response_d"
-                android:id="@+id/buttonResponse_d"
-                android:textColor="#ffffff"
-                android:layout_weight=".5" />
-        </LinearLayout>
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/buttonResponse_a"
+            android:width="256dp"
+            android:height="64dp" />
 
-    </LinearLayout>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/response_d"
+            android:id="@+id/buttonResponse_d"
+            android:textColor="#ffffff"
+
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/buttonResponse_b"
+            android:width="256dp"
+            android:height="64dp" />
+    </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/relativeLayout">
+        android:layout_height="wrap_content"
+        android:id="@+id/relativeLayoutBottomButtons"
+        android:layout_alignParentEnd="false"
+        android:layout_below="@+id/relativeLayoutResponseButtons"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="false"
+        android:gravity="bottom"
+        android:layout_marginBottom="16dp">
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/buttonHintText"
             android:id="@+id/buttonHint"
-            android:layout_marginBottom="16dp"
-            android:layout_alignParentBottom="true"
+            android:layout_alignParentBottom="false"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="16dp"
             android:textColor="#ffffff"
-            />
+            android:layout_alignParentTop="false"
+            android:layout_centerVertical="true"
+            android:width="140dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/labelScoreText"
-            android:id="@+id/scoreLabel"
-            android:layout_alignTop="@+id/buttonSkip"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="8dp"
-            android:textColor="#ffffff" />
+            android:id="@+id/textViewScoreLabel"
+            android:layout_marginTop="0dp"
+            android:textColor="#ffffff"
+            android:textSize="32sp"
+            android:layout_toRightOf="@+id/buttonHint"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="86dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/score_value"
+            android:id="@+id/textViewScoreValue"
+            android:textColor="#ffffff"
+            android:layout_toRightOf="@+id/textViewScoreLabel"
+            android:layout_marginLeft="16dp"
+            android:layout_centerVertical="true"
+            android:textSize="32sp" />
 
         <Button
             android:layout_width="wrap_content"
@@ -124,18 +145,9 @@
             android:layout_alignTop="@+id/buttonHint"
             android:layout_alignParentRight="true"
             android:layout_marginRight="16dp"
-            android:layout_marginBottom="16dp"
-            android:textColor="#ffffff"/>
+            android:textColor="#ffffff"
+            android:width="140dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/score_value"
-            android:id="@+id/scoreValue"
-            android:layout_below="@+id/scoreLabel"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="4dp"
-            android:textColor="#ffffff" />
     </RelativeLayout>
 
 

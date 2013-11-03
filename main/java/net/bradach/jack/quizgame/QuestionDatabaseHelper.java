@@ -20,10 +20,10 @@ public class QuestionDatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_CREATE =
             "CREATE TABLE Questions (" +
             "id integer primary key," +
-            "question test not null" +
-            "response_correct not null" +
-            "response_wrong_a not null" +
-            "response_wrong_b" +
+            "question test not null," +
+            "response_correct not null," +
+            "response_wrong_a not null," +
+            "response_wrong_b," +
             "response_wrong_c" +
             ");";
 
@@ -34,8 +34,7 @@ public class QuestionDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase database) {
-        return;
-
+        database.execSQL(DATABASE_CREATE);
     }
 
     @Override

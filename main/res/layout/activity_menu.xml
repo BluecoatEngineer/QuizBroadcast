@@ -2,29 +2,66 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="fill_parent"
     android:background="#000000">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp">
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Start Quiz"
+            android:id="@+id/buttonStartQuiz"
+            android:layout_gravity="center_horizontal"
+            android:textColor="#ffffff"
+            android:textSize="24sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Last Quiz Score:"
+            android:textColor="#ffffff"
+            android:id="@+id/textViewLastQuizScoreLabel"
+            android:textSize="24sp"
+            android:layout_gravity="center_horizontal"
+            android:layout_below="@+id/buttonStartQuiz"
+            android:layout_alignParentTop="false"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentBottom="false"
+            android:layout_alignLeft="@+id/buttonStartQuiz"
+            android:layout_marginLeft="32dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1000"
+            android:textColor="#ffffff"
+            android:textSize="24sp"
+            android:id="@+id/textViewLastQuizScoreValue"
+            android:layout_below="@+id/buttonStartQuiz"
+            android:layout_alignRight="@+id/buttonStartQuiz"
+            android:layout_marginRight="32dp" />
+    </RelativeLayout>
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageViewQuizLogo"
         android:src="@drawable/quiz_title"
-        android:adjustViewBounds="true" />
+        android:adjustViewBounds="true"
+        android:layout_gravity="center_horizontal" />
 
-    <Button
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Start Quiz"
-        android:id="@+id/buttonStartQuiz"
-        android:layout_gravity="center_horizontal"
-        android:textColor="#ffffff"
-        />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical|center_horizontal">
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp">
 
         <Button
             android:layout_width="wrap_content"
@@ -33,14 +70,35 @@
             android:id="@+id/buttonLessQuestions"
             android:layout_gravity="center_horizontal"
             android:textColor="#ffffff"
-            />
+            android:textSize="32sp"
+            android:width="32dp"
+            android:textAlignment="center"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="32dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Quiz Length: 10"
-            android:id="@+id/textViewQuizLength"
-            android:textColor="#ffffff"/>
+            android:text="Quiz Length:"
+            android:id="@+id/textViewQuizLengthLabel"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            android:layout_alignParentBottom="false"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/buttonLessQuestions"
+            android:layout_marginLeft="12dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:id="@+id/textViewQuizLengthValue"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/buttonMoreQuestions"
+            android:layout_marginRight="12dp" />
 
         <Button
             android:layout_width="wrap_content"
@@ -49,15 +107,74 @@
             android:id="@+id/buttonMoreQuestions"
             android:layout_gravity="center_horizontal"
             android:textColor="#ffffff"
-            />
-    </LinearLayout>
+            android:layout_marginRight="32dp"
+            android:textAlignment="center"
+            android:width="32dp"
+            android:textSize="32sp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true" />
 
-    <Button
-        android:layout_width="wrap_content"
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Remain Indoors"
-        android:id="@+id/buttonRemainIndoors"
-        android:layout_gravity="center_horizontal"
-        android:textColor="#ffffff"/>
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp">
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Reload Question Database"
+            android:id="@+id/buttonReloadDatabase"
+            android:textColor="#ffffff"
+            android:textSize="24sp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Questions in Database:"
+            android:id="@+id/textViewQuestionCountLabel"
+            android:layout_gravity="center_horizontal"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            android:layout_below="@+id/buttonReloadDatabase"
+            android:layout_alignLeft="@+id/buttonReloadDatabase"
+            android:layout_marginLeft="12dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="000"
+            android:id="@+id/textViewQuestionCountValue"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            android:layout_below="@+id/buttonReloadDatabase"
+            android:layout_alignRight="@+id/buttonReloadDatabase"
+            android:layout_marginRight="12dp" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp">
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Remain Indoors"
+            android:id="@+id/buttonRemainIndoors"
+            android:layout_gravity="center_horizontal"
+            android:textColor="#ffffff"
+            android:textSize="24sp"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="16dp" />
+
+    </RelativeLayout>
 
 </LinearLayout>

@@ -29,7 +29,8 @@
         android:gravity="left"
         android:layout_below="@+id/questionNumber"
         android:layout_alignParentLeft="true"
-        android:textColor="#ffffff" />
+        android:textColor="#ffffff"
+        android:height="128dp" />
 
     <LinearLayout
         android:orientation="vertical"
@@ -72,55 +73,71 @@
             android:layout_marginTop="4dp"
             android:layout_marginBottom="32dp"
             android:textColor="#ffffff" />
+
+        <Space
+            android:layout_width="fill_parent"
+            android:layout_height="32dp" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/buttonHintText"
+                    android:id="@+id/buttonHint"
+
+                    android:textColor="#ffffff"
+                    android:height="64dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentLeft="true"
+                    android:width="128dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/labelScoreText"
+                    android:id="@+id/textViewScoreLabel"
+                    android:textColor="#ffffff"
+                    android:gravity="center"
+                    android:textSize="24sp"
+                    android:textAlignment="center"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_alignTop="@+id/buttonHint" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:id="@+id/textViewScoreValue"
+                    android:textColor="#ffffff"
+                    android:gravity="center"
+                    android:layout_centerHorizontal="true"
+                    android:textSize="24sp"
+                    android:layout_alignBottom="@+id/buttonHint" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/buttonSkipText"
+                    android:id="@+id/buttonSkip"
+
+                    android:textColor="#ffffff"
+                    android:height="64dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:width="128dp" />
+            </RelativeLayout>
+
+        </LinearLayout>
     </LinearLayout>
-
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/buttonHintText"
-            android:id="@+id/buttonHint"
-            android:layout_marginBottom="16dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="16dp"
-            android:textColor="#ffffff"
-            />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/labelScoreText"
-            android:id="@+id/scoreLabel"
-            android:layout_alignTop="@+id/buttonSkip"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="8dp"
-            android:textColor="#ffffff" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/buttonSkipText"
-            android:id="@+id/buttonSkip"
-            android:layout_alignTop="@+id/buttonHint"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="16dp"
-            android:textColor="#ffffff"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/score_value"
-            android:id="@+id/scoreValue"
-            android:layout_below="@+id/scoreLabel"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="4dp"
-            android:textColor="#ffffff" />
-    </RelativeLayout>
 
 
 </RelativeLayout>

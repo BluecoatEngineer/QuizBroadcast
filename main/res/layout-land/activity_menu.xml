@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="fill_parent"
+    android:background="#000000">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp">
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Start Quiz"
+                android:id="@+id/buttonStartQuiz"
+                android:layout_gravity="center_horizontal"
+                android:textColor="#ffffff"
+                android:textSize="24sp"
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="32dp"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Last Quiz Score:"
+                android:textColor="#ffffff"
+                android:id="@+id/textViewLastQuizScoreLabel"
+                android:textSize="24sp"
+                android:textAlignment="center"
+                android:layout_gravity="center_horizontal"
+                android:layout_below="@+id/buttonStartQuiz"
+                android:layout_centerHorizontal="true"
+                android:layout_alignLeft="@+id/buttonStartQuiz"
+                android:layout_marginLeft="128dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0000"
+                android:textSize="24sp"
+                android:textColor="#ffffff"
+                android:id="@+id/textViewLastQuizScoreValue"
+                android:layout_below="@+id/buttonStartQuiz"
+                android:layout_alignRight="@+id/buttonStartQuiz"
+                android:layout_marginRight="128dp" />
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+"
+                android:id="@+id/buttonMoreQuestions"
+                android:layout_gravity="center_horizontal"
+                android:textColor="#ffffff"
+                android:textAlignment="center"
+                android:width="32dp"
+                android:textSize="32sp"
+                android:layout_alignParentLeft="false"
+                android:layout_alignParentTop="true"
+                android:layout_centerInParent="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Quiz Length"
+                android:id="@+id/textViewQuizLengthLabel"
+                android:layout_above="@+id/textViewQuizLengthValue"
+                android:layout_alignParentLeft="true"
+                android:layout_centerInParent="true"
+                android:textColor="#ffffff"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10"
+                android:id="@+id/textViewQuizLengthValue"
+                android:textColor="#ffffff"
+                android:textSize="32sp"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="-"
+                android:id="@+id/buttonLessQuestions"
+                android:layout_gravity="center_horizontal"
+                android:textColor="#ffffff"
+                android:textSize="32sp"
+                android:width="32dp"
+                android:textAlignment="center"
+                android:layout_alignParentStart="false"
+                android:layout_alignLeft="@+id/buttonMoreQuestions"
+                android:layout_alignParentBottom="false"
+                android:layout_centerInParent="true"
+                android:layout_below="@+id/textViewQuizLengthValue" />
+
+        </RelativeLayout>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageViewQuizLogo"
+            android:src="@drawable/quiz_title"
+            android:adjustViewBounds="true"
+            android:cropToPadding="false"
+            android:scaleType="fitCenter"
+            android:maxHeight="196dp" />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent">
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Reload Question Database"
+                android:id="@+id/buttonReloadDatabase"
+                android:textColor="#ffffff"
+                android:textSize="14sp"
+                android:gravity="center"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Questions in Database:"
+                android:id="@+id/textViewQuestionCountLabel"
+                android:layout_gravity="center_horizontal"
+                android:textColor="#ffffff"
+                android:textSize="16sp"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@+id/buttonReloadDatabase" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:id="@+id/textViewQuestionCountValue"
+                android:layout_below="@+id/textViewQuestionCountLabel"
+                android:layout_centerHorizontal="true"
+                android:textSize="24dp"
+                android:textColor="#ffffff"/>
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Remain Indoors"
+                android:id="@+id/buttonRemainIndoors"
+                android:layout_gravity="center_horizontal"
+                android:textColor="#ffffff"
+                android:textSize="12sp"
+                android:layout_alignParentEnd="false"
+                android:layout_marginTop="16dp"
+                android:layout_below="@+id/textViewQuestionCountValue"
+                android:layout_alignLeft="@+id/buttonReloadDatabase"
+                android:layout_alignParentBottom="false" />
+        </RelativeLayout>
+    </LinearLayout>
+
+</LinearLayout>

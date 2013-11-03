@@ -1,6 +1,7 @@
 package net.bradach.jack.quizgame;
 
 import android.content.Intent;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.app.Activity;
 import android.util.Log;
@@ -11,16 +12,19 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.net.ResponseCache;
 import java.util.ArrayList;
-import java.util.HashMap;
 
-public class QuizActivity extends Activity {
+public class QuizActivity extends Activity implements View.OnClickListener {
     private static final String TAG = "QuizGame";
+
+    private Global global;
+    private SoundPool soundPool;
+    private QuestionDeck questionDeck;
 
     /* Resource handles*/
     private TextView textViewQuestionNumber;
     private TextView textViewQuestionText;
-    private TextView textViewScoreLabel;
     private TextView textViewScoreValue;
     private Button buttonResponse_a;
     private Button buttonResponse_b;
@@ -32,32 +36,33 @@ public class QuizActivity extends Activity {
     /* Game variables */
     private Integer quizLength;
     private Integer quizScore;
-    private Integer questionNumber;
     private Question quizQuestion;
 
-    /* List of questions.  The skip button goes
-    * to the next one, but does not mark it as answered.*/
-    private ArrayList<Question> questionSet;
+    private ArrayList<Button> responseButtonList;
 
-    private boolean abort_quiz = false;
+    private boolean quizEnded = false;
 
-    private static final Integer DEFAULT_QUIZ_LENGTH = 10;
-    private static final Integer DEFAULT_QUIZ_SCORE = 0;
-    private static final Integer DEFAULT_QUESTION_NUMBER = 1;
-
-    private static final String BUNDLE_QUESTION_NUMBER = "net.bradach.jack.quizgame.QUESTION_NUMBER";
     private static final String BUNDLE_QUIZ_SCORE = "net.bradach.jack.quizgame.QUIZ_SCORE";
     private static final String BUNDLE_QUIZ_LENGTH = "net.bradach.jack.quizgame.QUIZ_LENGTH";
 
+    private static final Integer COLOR_CORRECT = 0xFF00A000;
+    private static final Integer COLOR_WRONG = 0xFFA00000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        /* Unpack any extras that may have come with the bundle. */
-        quizLength = getIntent().getIntExtra(BUNDLE_QUIZ_LENGTH, DEFAULT_QUIZ_LENGTH);
-        quizScore = getIntent().getIntExtra(BUNDLE_QUIZ_SCORE, DEFAULT_QUIZ_SCORE);
-        questionNumber = getIntent().getIntExtra(BUNDLE_QUESTION_NUMBER, DEFAULT_QUESTION_NUMBER);
+        /* Pull in any extras from the intent. */
+        Bundle extras = getIntent().getExtras();
+        quizScore = extras.getInt(BUNDLE_QUIZ_SCORE);
+        quizLength = extras.getInt(BUNDLE_QUIZ_LENGTH);
+
+        /* Restore any variables from the saved instance (or set defaults where appropriate) */
+        if (savedInstanceState != null) {
+            Log.d(TAG, "Restoring instance state");
+            quizLength = savedInstanceState.getInt(BUNDLE_QUIZ_LENGTH);
+            quizScore = savedInstanceState.getInt(BUNDLE_QUIZ_SCORE);
+        }
 
         /* Set the layout to be fullscreen with no title bar.  This "should" be able to
          * be done in the XML style, but it doesn't seem to be of an inclination to honor
@@ -70,91 +75,103 @@ public class QuizActivity extends Activity {
         /* Inflate our layout */
         setContentView(R.layout.activity_quiz);
 
+        /* Set up Global pointers */
+        global = Global.getInstance();
+        soundPool = global.soundPool;
+        questionDeck = global.questionDeck;
+
+        /* Pull current question. */
+        quizQuestion = questionDeck.getCurrentQuestion();
+
         /* Match XML resources to the appropriate handles in our object */
         textViewQuestionNumber = (TextView) findViewById(R.id.questionNumber);
         textViewQuestionText = (TextView) findViewById(R.id.questionText);
-        textViewScoreLabel = (TextView) findViewById(R.id.scoreLabel);
-        textViewScoreValue = (TextView) findViewById(R.id.scoreValue);
-        buttonResponse_a = (Button) findViewById(R.id.buttonResponse_a);
-        buttonResponse_b = (Button) findViewById(R.id.buttonResponse_b);
-        buttonResponse_c = (Button) findViewById(R.id.buttonResponse_c);
-        buttonResponse_d = (Button) findViewById(R.id.buttonResponse_d);
-        buttonHint = (Button) findViewById(R.id.buttonHint);
-        buttonSkip = (Button) findViewById(R.id.buttonSkip);
+        textViewScoreValue = (TextView) findViewById(R.id.textViewScoreValue);
 
-        /* Set up listeners */
-        buttonResponse_a.setOnClickListener(responseOnClick);
-        buttonResponse_b.setOnClickListener(responseOnClick);
-        buttonResponse_c.setOnClickListener(responseOnClick);
-        buttonResponse_d.setOnClickListener(responseOnClick);
-
-        /* The 'Skip' button takes us to the next question but
-         * does not mark this one as incorrect.  The player can
-         * come back to the question later.
+        /* Map response button handles to their objects, set up their
+         * onClick listeners, and populate the list of response buttons.
          */
-        buttonSkip.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                questionNumber++;
-                Intent i = new Intent(QuizActivity.this, QuizActivity.class);
-                i.putExtra(BUNDLE_QUIZ_LENGTH, quizLength);
-                i.putExtra(BUNDLE_QUIZ_SCORE, quizScore);
-                i.putExtra(BUNDLE_QUESTION_NUMBER, questionNumber);
-                startActivity(i);
-                finish();
+        responseButtonList = new ArrayList<Button>();
+
+        buttonResponse_a = (Button) findViewById(R.id.buttonResponse_a);
+        buttonResponse_a.setOnClickListener(responseOnClick);
+        responseButtonList.add(buttonResponse_a);
+
+        buttonResponse_b = (Button) findViewById(R.id.buttonResponse_b);
+        buttonResponse_b.setOnClickListener(responseOnClick);
+        responseButtonList.add(buttonResponse_b);
+
+        buttonResponse_c = (Button) findViewById(R.id.buttonResponse_c);
+        buttonResponse_c.setOnClickListener(responseOnClick);
+        responseButtonList.add(buttonResponse_c);
+
+        buttonResponse_d = (Button) findViewById(R.id.buttonResponse_d);
+        buttonResponse_d.setOnClickListener(responseOnClick);
+        responseButtonList.add(buttonResponse_d);
+
+        /* Map the other buttons handles and set up their listeners. */
+        buttonHint = (Button) findViewById(R.id.buttonHint);
+        buttonHint.setOnClickListener(this);
+
+        /* The hint button is only enabled if cheats are available. */
+        if (!quizQuestion.canCheat()) {
+            buttonHint.setEnabled(false);
+        } else {
+            buttonHint.setEnabled(true);
+        }
+
+
+        buttonSkip = (Button) findViewById(R.id.buttonSkip);
+        buttonSkip.setOnClickListener(this);
+
+        /* If this is the last remaining un-attempted question, disable the
+         * skip button and change it to say "last question".
+         */
+        if (questionDeck.getUnansweredQuestionsRemaining() == 1) {
+            buttonSkip.setEnabled(false);
+            buttonSkip.setText("Last\nQuestion");
+        }
+
+        /* Update on-screen score with current value.  */
+        textViewScoreValue.setText(quizScore.toString());
+
+        /* Update the question header and question text. */
+        textViewQuestionNumber.setText("Question #" + quizQuestion.getNumber()
+                + " of " + questionDeck.getDeckSize());
+        textViewQuestionText.setText(quizQuestion.getQuestionText());
+
+        /* Finally, update the response buttons. */
+        updateResponseButtons();
+
+    }
+
+    /* Draw (or re-draw) the responses printed on the response buttons.
+     * This will potentially set them invisible if the question object
+     * indicates that there is no text for the button.
+     */
+    void updateResponseButtons() {
+        for (int i = 0; i < 4; i++ ) {
+            Button response = (Button) responseButtonList.get(i);
+            String responseText = (String) quizQuestion.getResponseText(i);
+
+            /* If getResponseText kicks back a null, that means that
+             * the choice should not be displayed, either because
+             * the questions doesn't have that many responses or
+             * (more likely) because the player has asked for a hint.
+             */
+            if (responseText == null) {
+                response.setVisibility(View.INVISIBLE);
+                continue;
             }
-        });
 
-        /*
-        quizQuestion.shuffleResponses();
-        textViewQuestionNumber.setText("Question #" + questionNumber);
-        textViewQuestionText.setText(quizQuestion.getQuestionText());
-        buttonResponse_a.setText(quizQuestion.getResponseText(0));
-        buttonResponse_b.setText(quizQuestion.getResponseText(1));
-        buttonResponse_c.setText(quizQuestion.getResponseText(2));
-        buttonResponse_d.setText(quizQuestion.getResponseText(3));
-
-        textViewScoreValue.setText(quizScore.toString());
-        */
-        testQuestion();
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.quiz, menu);
-        return true;
-    }
-
-    void testQuestion() {
-        HashMap<QuestionEntries, String> questionMap;
-
-        questionMap = new HashMap<QuestionEntries, String>();
-        questionMap.put(QuestionEntries.QUESTION,
-                "What is secured in a ship's cathead?");
-        questionMap.put(QuestionEntries.RESPONSE_CORRECT,
-                "The anchor");
-        questionMap.put(QuestionEntries.RESPONSE_WRONG_A,
-                "Ammunition");
-        questionMap.put(QuestionEntries.RESPONSE_WRONG_B,
-                "Cat litter");
-        questionMap.put(QuestionEntries.RESPONSE_WRONG_C,
-                "Tigers");
-
-        quizQuestion = new Question(questionMap);
-
-        quizQuestion.shuffleResponses();
-
-        textViewQuestionNumber.setText("Question #" + questionNumber);
-        textViewQuestionText.setText(quizQuestion.getQuestionText());
-        buttonResponse_a.setText(quizQuestion.getResponseText(0));
-        buttonResponse_b.setText(quizQuestion.getResponseText(1));
-        buttonResponse_c.setText(quizQuestion.getResponseText(2));
-        buttonResponse_d.setText(quizQuestion.getResponseText(3));
-
-        textViewScoreValue.setText(quizScore.toString());
-
+            /* Otherwise, set the button to display the text
+             * for this response.  Set button visible, just
+             * in case there was some carry-over from a previous
+             * question.
+             */
+            response.setText(responseText);
+            response.setVisibility(View.VISIBLE);
+        }
     }
 
     /* Handler for response onClicks.  Since the handler is nearly identical
@@ -187,64 +204,133 @@ public class QuizActivity extends Activity {
             }
 
             if (quizQuestion.isResponseCorrect(responseNum)) {
-                quizScore++;
-                questionNumber++;
+                quizScore += quizQuestion.getWorth();
+                textViewScoreValue.setText(quizScore.toString());
             }
 
-            /* Turn off all the response buttons */
-            buttonResponse_a.setEnabled(false);
-            buttonResponse_b.setEnabled(false);
-            buttonResponse_c.setEnabled(false);
-            buttonResponse_d.setEnabled(false);
+            /* Disable all of the response buttons and set
+             * Set the button holding the correct answer to be green.
+             */
+            for (int i = 0; i < 4; i++) {
+                Button response = (Button) responseButtonList.get(i);
+                response.setEnabled(false);
 
-            /* Change 'skip' to 'next' to suggest what they should do */
-            buttonSkip.setText("Next");
-            /*
-              if (questionNumber < 10)
-                this->nextQuestion();
-              else
-                this->endQuiz();
-            */
+                if (quizQuestion.isResponseCorrect(i)) {
+                    response.setBackgroundColor(COLOR_CORRECT);
+                } else if (responseNum == i) {
+                    response.setBackgroundColor(COLOR_WRONG);
+                }
 
 
+            }
+
+            /* Mark this question as having been attempted */
+            quizQuestion.setAttempted();
+
+            /* After answering a question, change 'skip' to 'next' to suggest what
+             * they should do.  If this was the last question, change the button
+             * to say "End Quiz" and re-enable it (since it would have been disabled
+             * earlier).*/
+            if (questionDeck.getUnansweredQuestionsRemaining() > 0) {
+                buttonSkip.setText("Next\nQuestion");
+            } else {
+                quizEnded = true;
+                buttonSkip.setEnabled(true);
+                buttonSkip.setText("End\nQuiz");
+            }
 
 
         }
     };
 
-
+    /* The class interface for onClick is used specifically to allow the enter/exit
+     * animations to be overridden.  The parent class has to be an Activity in
+     * order to do that.  Having an inner class or anonymous class for the listener
+     * doesn't cut it.  There are a couple other methods I could use to get around
+     * this, but this was the cleanest.
+     */
     @Override
-    protected void onPause() {
-        super.onPause();
+    public void onClick(View v) {
+        switch(v.getId()) {
+            /* If 'skip' is chosen, and the quiz is not over, spawn a new QuizActivity.
+             * This QuizActivity dies after spawning the new one (no reason for it to
+             * stick around).  If we have finished the quiz, then send the result back
+             * to
+             *
+             */
+            case R.id.buttonSkip:
 
-        /* Play the slide change sound clip as we leave */
-        Globals.soundPool.play(1, 1, 1, 0, 0, 1);
+                if (quizEnded == true) {
+                    Intent returnIntent = new Intent();
+                    returnIntent.putExtra(BUNDLE_QUIZ_SCORE, quizScore);
+                    soundPool.play(1, 1, 1, 0, 0, 1);
+                    setResult(Activity.RESULT_OK, returnIntent);
+                    finish();
+                    this.overridePendingTransition(R.anim.animation_slideright_newactivity, R.anim.animation_slideright_oldactivity);
+                } else {
+                    /* queue up the next question. */
+                    questionDeck.getNextQuestion();
+                    Intent nextQuiz = new Intent(QuizActivity.this, QuizActivity.class);
+                    nextQuiz.putExtra(BUNDLE_QUIZ_LENGTH, quizLength);
+                    nextQuiz.putExtra(BUNDLE_QUIZ_SCORE, quizScore);
+                    soundPool.play(1, 1, 1, 0, 0, 1);
+                    startActivityForResult(nextQuiz, 1);
+                    this.overridePendingTransition(R.anim.animation_slideleft_newactivity, R.anim.animation_slideleft_oldactivity);
 
-        /* If we hit 'skip', advance from right to left.  If we hit back, we're going back
-        * to the main menu so we want to go back to the main menu.
-        */
-        if (abort_quiz == true) {
-            this.overridePendingTransition(R.anim.animation_slideright_newactivity, R.anim.animation_slideright_oldactivity);
-        } else {
-            this.overridePendingTransition(R.anim.animation_slideleft_newactivity, R.anim.animation_slideleft_oldactivity);
+                }
+
+                break;
+
+            /* Eliminate an incorrect response.  The 'cheat' call
+             * is safe in that if no more cheats were available,
+             * it simply does nothing.  After the cheat, the hint
+             * button gets disabled if there are no more cheats.
+             */
+            case R.id.buttonHint:
+                quizQuestion.cheat();
+
+                if (!quizQuestion.canCheat()) {
+                    buttonHint.setEnabled(false);
+                }
+
+                /* The text for the response buttons has
+                 * changed, so redraw them.
+                 */
+                updateResponseButtons();
+
+                break;
+
         }
     }
 
+
+    /* If back is pressed, abort the quiz from where we are and spawn a new MenuActivity.
+     * Score is not preserved and the result is listed as "canceled."
+     */
     @Override
     public void onBackPressed() {
         /* TODO: Add a 'back twice to exit,' with a toast.*/
-        abort_quiz = true;
+        soundPool.play(1, 1, 1, 0, 0, 1);
+        Intent returnIntent = new Intent();
+        setResult(RESULT_CANCELED, returnIntent);
         finish();
-
+        this.overridePendingTransition(R.anim.animation_slideright_newactivity, R.anim.animation_slideright_oldactivity);
     }
 
-    private void nextQuestion() {
-        questionNumber++;
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
 
-
+        savedInstanceState.putInt(BUNDLE_QUIZ_LENGTH, quizLength);
+        savedInstanceState.putInt(BUNDLE_QUIZ_SCORE, quizScore);
     }
 
-
+    protected void onActivityResult(int requestCode, int resultCode, Intent i) {
+        Intent returnIntent = new Intent();
+        returnIntent.putExtras(i);
+        setResult(resultCode, returnIntent);
+        finish();
+    }
 
 
 }
