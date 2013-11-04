@@ -6,7 +6,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 /**
- * Created by jack on 27/10/13.
+ * Wrapper to help with database opening/creation operations.
+ *
+ * Extends and implements the interfaces from SQLiteOpenHelper
+ * so I can open a database without much trouble.
  */
 public class QuestionDatabaseHelper extends SQLiteOpenHelper {
 
@@ -26,7 +29,6 @@ public class QuestionDatabaseHelper extends SQLiteOpenHelper {
             "response_wrong_b," +
             "response_wrong_c" +
             ");";
-
 
     public QuestionDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

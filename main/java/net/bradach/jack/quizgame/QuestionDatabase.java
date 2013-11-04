@@ -4,50 +4,44 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 /**
- * Created by jack on 27/10/13.
+ * QuestionDatabase provides a wrapper to the underlying SQLite database in
+ * which questions are stored.  It essentially acts as a Question to Database
+ * interface.
  */
 final public class QuestionDatabase {
-    private static final String TAG = "QuestionDatabase";
+    /* We can only have one instance of QuestionDatabase */
     private static QuestionDatabase instance = null;
 
-    private QuestionDatabaseHelper dbHelper;
+    /* Handle to the underlying database. */
     private SQLiteDatabase database;
 
+    /* Constants */
+    private static final String TAG = "QuestionDatabase";
     private final static String TABLE_QUESTIONS = "Questions";
-
-    private final static String QUESTIONS_ID = "id";
     private final static String QUESTIONS_QUESTION = "question";
     private final static String QUESTIONS_RESPONSE_CORRECT = "response_correct";
     private final static String QUESTIONS_RESPONSE_WRONG_A = "response_wrong_a";
     private final static String QUESTIONS_RESPONSE_WRONG_B = "response_wrong_b";
     private final static String QUESTIONS_RESPONSE_WRONG_C = "response_wrong_c";
 
-
-    public QuestionDatabase getInstance() {
-        return instance;
-    }
-
     /* Constructor which uses the helper class to get our database handle. */
     public QuestionDatabase(Context context) throws ExceptionInInitializerError {
         if (instance == null) {
-            dbHelper = new QuestionDatabaseHelper(context);
+            QuestionDatabaseHelper dbHelper = new QuestionDatabaseHelper(context);
             database = dbHelper.getWritableDatabase();
             instance = this;
         } else {
             throw new ExceptionInInitializerError("Attempted to instantiate QuestionDatabase more than once!");
         }
     }
-
 
     /* Pull quizSize number of entries from the question database and return them
      * in a List, suitable for tossing into the QuestionDeck.
@@ -85,7 +79,7 @@ final public class QuestionDatabase {
             questionList.add(thisQuestion);
             cursor.moveToNext();
         }
-    }
+    } // getQuestions
 
     /* Query the database to find out how many questions are contained
      * therein.  It simply returns the number of rows found in the Questions
@@ -150,8 +144,6 @@ final public class QuestionDatabase {
                 /* Use the InsertHelper to prepare the insertion. *snrk* */
                 insertHelper.prepareForInsert();
 
-
-
                 /* Populate our fields for each column */
                 insertHelper.bind(id_question, question);
                 insertHelper.bind(id_correct, response_correct);
@@ -174,10 +166,5 @@ final public class QuestionDatabase {
                 inputStream.close();
             } catch (java.io.IOException e) { /* NARF! */}
         }
-
-
-
-    }
-
-
-}
+    } // loadDatabase
+} // QuestionDatabase

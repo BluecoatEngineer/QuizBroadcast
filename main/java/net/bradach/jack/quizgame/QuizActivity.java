@@ -17,21 +17,25 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+/**
+ * The QuizActivity is the "game play" activity.  It is spawned from the
+ * MenuActivity and presents the player with a single question.  Further
+ * QuizActivities are spawned when they answer the question and hit "next"
+ * or skip a question (which will be returned to later).  The result code
+ * is then set back through each QuizActivity back to the MenuActivity at
+ * the end of the quiz.  There is a bug here, wherein a user can get deep
+ * enough that it will lose track of the originating activity.  Most users
+ * don't do that, however.  In testing, I had to skip about 50 questions in
+ * a row before I could no longer go back.
+ */
 public class QuizActivity extends Activity implements View.OnClickListener {
-    private static final String TAG = "QuizGame";
-
+    /* References to global structures */
     private Global global;
     private SoundPool soundPool;
     private QuestionDeck questionDeck;
 
     /* Resource handles*/
-    private TextView textViewQuestionNumber;
-    private TextView textViewQuestionText;
     private TextView textViewScoreValue;
-    private Button buttonResponse_a;
-    private Button buttonResponse_b;
-    private Button buttonResponse_c;
-    private Button buttonResponse_d;
     private Button buttonHint;
     private Button buttonSkip;
 
@@ -40,24 +44,30 @@ public class QuizActivity extends Activity implements View.OnClickListener {
     private Integer quizScore;
     private Question quizQuestion;
 
+    /* List of the response buttons, for easy iterating. */
     private ArrayList<Button> responseButtonList;
 
+    /* Flag indicating that the quiz has completed. */
     private boolean quizDone = false;
 
+    /* Constants! */
+    private static final String TAG = "QuizGame";
     private static final String BUNDLE_QUIZ_SCORE = "net.bradach.jack.quizgame.QUIZ_SCORE";
     private static final String BUNDLE_QUIZ_LENGTH = "net.bradach.jack.quizgame.QUIZ_LENGTH";
     private static final String BUNDLE_QUIZ_DONE = "net.bradach.jack.quizgame.QUIZ_DONE";
-
-
     private static final Integer COLOR_CORRECT = 0xFF00A000;
     private static final Integer COLOR_WRONG = 0xFFA00000;
 
+    /* Set up everything needed to show a question (or handle coming back
+     * from a suspended state).  All listeners are set up in onCreate.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         /* Pull in any extras from the intent. */
         Bundle extras = getIntent().getExtras();
+        assert extras != null;
         quizScore = extras.getInt(BUNDLE_QUIZ_SCORE);
         quizLength = extras.getInt(BUNDLE_QUIZ_LENGTH);
 
@@ -94,8 +104,8 @@ public class QuizActivity extends Activity implements View.OnClickListener {
         quizQuestion = questionDeck.getCurrentQuestion();
 
         /* Match XML resources to the appropriate handles in our object */
-        textViewQuestionNumber = (TextView) findViewById(R.id.questionNumber);
-        textViewQuestionText = (TextView) findViewById(R.id.questionText);
+        TextView textViewQuestionNumber = (TextView) findViewById(R.id.questionNumber);
+        TextView textViewQuestionText = (TextView) findViewById(R.id.questionText);
         textViewScoreValue = (TextView) findViewById(R.id.textViewScoreValue);
 
         /* Map response button handles to their objects, set up their
@@ -103,22 +113,22 @@ public class QuizActivity extends Activity implements View.OnClickListener {
          */
         responseButtonList = new ArrayList<Button>();
 
-        buttonResponse_a = (Button) findViewById(R.id.buttonResponse_a);
+        Button buttonResponse_a = (Button) findViewById(R.id.buttonResponse_a);
         buttonResponse_a.setSoundEffectsEnabled(false);
         buttonResponse_a.setOnClickListener(responseOnClick);
         responseButtonList.add(buttonResponse_a);
 
-        buttonResponse_b = (Button) findViewById(R.id.buttonResponse_b);
+        Button buttonResponse_b = (Button) findViewById(R.id.buttonResponse_b);
         buttonResponse_b.setSoundEffectsEnabled(false);
         buttonResponse_b.setOnClickListener(responseOnClick);
         responseButtonList.add(buttonResponse_b);
 
-        buttonResponse_c = (Button) findViewById(R.id.buttonResponse_c);
+        Button buttonResponse_c = (Button) findViewById(R.id.buttonResponse_c);
         buttonResponse_c.setSoundEffectsEnabled(false);
         buttonResponse_c.setOnClickListener(responseOnClick);
         responseButtonList.add(buttonResponse_c);
 
-        buttonResponse_d = (Button) findViewById(R.id.buttonResponse_d);
+        Button buttonResponse_d = (Button) findViewById(R.id.buttonResponse_d);
         buttonResponse_d.setSoundEffectsEnabled(false);
         buttonResponse_d.setOnClickListener(responseOnClick);
         responseButtonList.add(buttonResponse_d);
@@ -162,13 +172,15 @@ public class QuizActivity extends Activity implements View.OnClickListener {
         } else {
             updateLayout();
         }
-
-
-    }
+    } // onCreate
 
     /* Draw (or re-draw) the responses printed on the response buttons.
      * This will potentially set them invisible if the question object
-     * indicates that there is no text for the button.
+     * indicates that there is no text for the button.  This routine
+     * contains animators for when a question is cheated on.  This
+     * looks cool, but I rather late in the game realized that they
+     * require API >= 11 in order to work, meaning that Honeycomb is
+     * a requirement.  I updated the manifest to reflect this.
      */
     void updateLayout() {
 
@@ -178,9 +190,13 @@ public class QuizActivity extends Activity implements View.OnClickListener {
             return;
         }
 
+        /* Iterate over each response button and update the
+         * text associated with it from the Question object.  Apply
+         * any modifiers needed given its state.
+         */
         for (int i = 0; i < 4; i++ ) {
-            final Button response = (Button) responseButtonList.get(i);
-            String responseText = (String) quizQuestion.getResponseText(i);
+            final Button response = responseButtonList.get(i);
+            String responseText = quizQuestion.getResponseText(i);
 
             /* If getResponseText kicks back a null, that means that
              * the choice should not be displayed, either because
@@ -195,7 +211,9 @@ public class QuizActivity extends Activity implements View.OnClickListener {
                     final ObjectAnimator anim = ObjectAnimator.ofFloat(response, "alpha", 1.0f, 0.0f);
 
                     /* A callback for the animator so that we can disable the button once it
-                     * has faded out.
+                     * has faded out.  The "hint" button gets disabled for the duration of
+                     * the animation as well.  It looked bad if you double-tapped it, causing
+                     * two animations concurrently.
                      */
                     anim.addListener(new Animator.AnimatorListener() {
                         Boolean oldHintButtonState;
@@ -218,13 +236,13 @@ public class QuizActivity extends Activity implements View.OnClickListener {
                         @Override
                         public void onAnimationRepeat(Animator animator) { }
                     });
-
                     anim.setDuration(500);
                     anim.start();
-
-                    continue;
                 } else {
-                    response.setText(responseText);
+                    /* The response was already dead from being cheated on
+                     * earlier;  Don't reanimate it, just mark it invisible.
+                     */
+                    response.setText(null);
                     response.setVisibility(View.INVISIBLE);
                 }
             } else {
@@ -244,8 +262,8 @@ public class QuizActivity extends Activity implements View.OnClickListener {
      */
     void updateResponseButtonsAfterRestore() {
         for (int i = 0; i < 4; i++ ) {
-            Button response = (Button) responseButtonList.get(i);
-            String responseText = (String) quizQuestion.getResponseText(i);
+            Button response = responseButtonList.get(i);
+            String responseText = quizQuestion.getResponseText(i);
 
             /* Button was disabled, restore that state. */
             if (responseText == null) {
@@ -265,14 +283,14 @@ public class QuizActivity extends Activity implements View.OnClickListener {
      * and test whether the response was correct.  If so, a point is awarded
      * and either goes to the next question or ends the quiz.
      */
-    View.OnClickListener responseOnClick = new View.OnClickListener() {
+    private final View.OnClickListener responseOnClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             int responseNum = -1;
 
-        /* Figure out what button got hit.  There's no default case
-         * because all possibilities are being covered in the switch.
-         */
+            /* Figure out what button got hit.  There's no default case
+             * because all possibilities are being covered in the switch.
+             */
             switch (v.getId()) {
                 case (R.id.buttonResponse_a):
                     responseNum = 0;
@@ -293,6 +311,9 @@ public class QuizActivity extends Activity implements View.OnClickListener {
              */
             quizQuestion.setResponse(responseNum);
 
+            /* If the question was correct, they get points and a ding.  If
+             * not, they get the buzzer.
+             */
             if (quizQuestion.isResponseCorrect(responseNum)) {
                 quizScore += quizQuestion.getWorth();
                 textViewScoreValue.setText(quizScore.toString());
@@ -314,6 +335,12 @@ public class QuizActivity extends Activity implements View.OnClickListener {
         }
     };
 
+    /**
+     * When the question has been responded to, we use a slightly different method
+     * of updating the layout.  It changes some of the labels and disables all the
+     * buttons except for next/end.  Also, the correct (and possibly incorrect)
+     * responses are highlighted.
+     */
     void updateLayoutForAnswered() {
         Integer responseNum = quizQuestion.getResponse();
 
@@ -336,32 +363,12 @@ public class QuizActivity extends Activity implements View.OnClickListener {
          * Set the button holding the correct answer to be green.
          */
         for (int i = 0; i < 4; i++) {
-            Button response = (Button) responseButtonList.get(i);
-            String responseText = (String) quizQuestion.getResponseText(i);
+            Button response = responseButtonList.get(i);
+            String responseText = quizQuestion.getResponseText(i);
             if (responseText == null) {
                 response.setVisibility(View.INVISIBLE);
             }
 
-            response.setText(responseText);
-            response.setEnabled(false);
-
-            if (quizQuestion.isResponseCorrect(i)) {
-                response.setBackgroundColor(COLOR_CORRECT);
-            } else if (responseNum == i) {
-                response.setBackgroundColor(COLOR_WRONG);
-            }
-        }
-    }
-
-    void updateLayoutForAnsweredAfterRestore() {
-        Integer responseNum = quizQuestion.getResponse();
-
-        /* Disable all of the response buttons and set
-         * Set the button holding the correct answer to be green.
-         */
-        for (int i = 0; i < 4; i++) {
-            Button response = (Button) responseButtonList.get(i);
-            String responseText = (String) quizQuestion.getResponseText(i);
             response.setText(responseText);
             response.setEnabled(false);
 
@@ -388,7 +395,7 @@ public class QuizActivity extends Activity implements View.OnClickListener {
              * to the parent of this activity (which will fire-brigade it back to the menu).
              */
             case R.id.buttonSkip:
-                if (quizDone == true) {
+                if (quizDone) {
                     /* Kill the background music */
                     global.mediaPlayer.stop();
                     Intent returnIntent = new Intent();
@@ -442,7 +449,6 @@ public class QuizActivity extends Activity implements View.OnClickListener {
         }
     }
 
-
     /* If back is pressed, abort the quiz from where we are and spawn a new MenuActivity.
      * Score is not preserved and the result is listed as "canceled."
      */
@@ -452,13 +458,14 @@ public class QuizActivity extends Activity implements View.OnClickListener {
         global.mediaPlayer.stop();
 
         /* TODO: Add a 'back twice to exit,' with a toast.*/
-        soundPool.play(global.soundMap.get(SoundList.SLIDE_ADVANCE), 1, 1, 0, 0, 1);;
+        soundPool.play(global.soundMap.get(SoundList.SLIDE_ADVANCE), 1, 1, 0, 0, 1);
         Intent returnIntent = new Intent();
         setResult(RESULT_CANCELED, returnIntent);
         finish();
         this.overridePendingTransition(R.anim.animation_slideright_newactivity, R.anim.animation_slideright_oldactivity);
     }
 
+    /* Save the few variables we need to keep our state. */
     @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
@@ -468,6 +475,9 @@ public class QuizActivity extends Activity implements View.OnClickListener {
         savedInstanceState.putBoolean(BUNDLE_QUIZ_DONE, quizDone);
     }
 
+    /* Pass the result to the parent activity (which does the same until it
+     * reaches the menuActivity.
+     */
     protected void onActivityResult(int requestCode, int resultCode, Intent i) {
         Intent returnIntent = new Intent();
         returnIntent.putExtras(i);
@@ -492,7 +502,4 @@ public class QuizActivity extends Activity implements View.OnClickListener {
             global.mediaPlayer.start();
         }
     }
-
-
-
-}
+} // QuizActivity

@@ -1,7 +1,10 @@
 package net.bradach.jack.quizgame;
 
 /**
- * Created by jack on 27/10/13.
+ * Types of fields in a question.  These correspond to
+ * the fields in the database.  Each question is
+ * comprised of fives strings: a question, a correct
+ * answer, and up to three incorrect responses.
  */
 public enum QuestionEntries {
     QUESTION,

@@ -1,7 +1,10 @@
 package net.bradach.jack.quizgame;
 
 /**
- * Created by jack on 03/11/13.
+ * Enumeration of the different sounds
+ * available in the QuizGame.  These
+ * are used with the SoundPool object
+ * to play sound effects.
  */
 public enum SoundList {
     SLIDE_ADVANCE,

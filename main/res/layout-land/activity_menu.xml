@@ -166,7 +166,7 @@
                 android:id="@+id/textViewQuestionCountValue"
                 android:layout_below="@+id/textViewQuestionCountLabel"
                 android:layout_centerHorizontal="true"
-                android:textSize="24dp"
+                android:textSize="24sp"
                 android:textColor="#ffffff"/>
 
             <Button

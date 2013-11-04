@@ -1,22 +1,38 @@
 package net.bradach.jack.quizgame;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Random;
 
+/**
+ * The Question class holds a single quiz question.  It provides methods
+ * to check whether or not a response is correct, to shuffle the available
+ * responses, a way to 'cheat' (at a cost of half the questions worth),
+ * and determining whether or not a question has been attempted.
+ */
 public class Question {
     /* Keeps track of what question we are. */
-    private Integer number;
+    private final Integer number;
 
-    private String question = null;
+    /* Whether or not this question has been attempted. */
     private boolean attempted = false;
 
-    private Integer cheatCount = 0;
+    /* The answer the user provided when they attempted the question. */
     private Integer response = -1;
 
-    private ArrayList< HashMap<QuestionEntries, String>> responses;
+    /* Text of the question */
+    private String question = null;
+
+    /* How many times the user has 'cheated' on this question. */
+    private Integer cheatCount = 0;
+
+    /* Array of Hashmaps,each containing a the type of response
+     * and the text that goes along with it.  The array wraps the
+     * HashMap because HashMaps are unordered;  I needed a way to
+     * be able to match a response to a specific element.
+     */
+    private final ArrayList<HashMap<QuestionEntries, String>> responses;
 
     /* Each question starts at a value of 100 points. */
     private final Integer worth = 100;
@@ -161,9 +177,10 @@ public class Question {
 
     /* If cheats are still available, returns true. */
     public boolean canCheat() {
-        return ((cheatCount < 2) ? true : false);
+        return (cheatCount < 2);
     }
 
+    /* Returns the number of cheats remaining. */
     public Integer getCheatCount() {
         return cheatCount;
     }
@@ -174,6 +191,9 @@ public class Question {
     public Integer getWorth() {
         Integer adjusted_worth = worth;
 
+        /* Each used cheat causes the point value to be
+         * cut in half.  100->50->25.
+         */
         for (int i = 0; i < cheatCount; i++) {
             adjusted_worth = adjusted_worth / 2;
         }
@@ -181,10 +201,12 @@ public class Question {
         return adjusted_worth;
     }
 
+    /* Accessor for checking how the user responded. */
     public Integer getResponse() {
         return response;
     }
 
+    /* Mutator for setting how the user responded.*/
     public void setResponse(Integer response) {
         this.response = response;
     }
