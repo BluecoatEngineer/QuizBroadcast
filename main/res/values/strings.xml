@@ -21,5 +21,6 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="toast_db_not_loaded">Not enough questions in database for quiz!
         Reload database before starting!</string>
+    <string name="toast_no_more_cheats">No more hints allowed!</string>
 
 </resources>

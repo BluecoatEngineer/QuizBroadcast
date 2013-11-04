@@ -11,13 +11,10 @@ public class Question {
     private Integer number;
 
     private String question = null;
-    private String response_correct = null;
-    private String response_wrong_a = null;
-    private String response_wrong_b = null;
-    private String response_wrong_c = null;
     private boolean attempted = false;
 
     private Integer cheatCount = 0;
+    private Integer response = -1;
 
     private ArrayList< HashMap<QuestionEntries, String>> responses;
 
@@ -44,10 +41,6 @@ public class Question {
         /* Copy the input variables into our internal ones. */
         this.number = number;
         this.question = question;
-        this.response_correct = response_correct;
-        this.response_wrong_a = response_wrong_a;
-        this.response_wrong_b = response_wrong_b;
-        this.response_wrong_c = response_wrong_c;
 
         /* Add the correct answer and any incorrect answers to the
          * response list.  They're shoved into a HashMap so we can figure
@@ -171,6 +164,10 @@ public class Question {
         return ((cheatCount < 2) ? true : false);
     }
 
+    public Integer getCheatCount() {
+        return cheatCount;
+    }
+
     /* Return this questions current (possibly final) point worth,
      * adjusted based on the number of cheats the user took.
      */
@@ -182,5 +179,13 @@ public class Question {
         }
 
         return adjusted_worth;
+    }
+
+    public Integer getResponse() {
+        return response;
+    }
+
+    public void setResponse(Integer response) {
+        this.response = response;
     }
 }

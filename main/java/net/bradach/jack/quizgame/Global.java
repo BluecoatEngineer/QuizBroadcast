@@ -1,6 +1,9 @@
 package net.bradach.jack.quizgame;
 
+import android.media.MediaPlayer;
 import android.media.SoundPool;
+
+import java.util.HashMap;
 
 /**
  * Class to store globally-used objects and variables.
@@ -22,5 +25,8 @@ final public class Global {
     public SoundPool soundPool;
     public QuestionDeck questionDeck;
     public QuestionDatabase questionDatabase;
-    public Integer soundsLoaded;
+    public boolean soundsLoaded;
+    public Integer soundsLoadedCount;
+    public MediaPlayer mediaPlayer;
+    HashMap<SoundList, Integer> soundMap;
 }

@@ -3,10 +3,10 @@ package net.bradach.jack.quizgame;
 import android.app.Activity;
 import android.content.Intent;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
@@ -15,49 +15,53 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.util.HashMap;
 
+/* MenuActivity is the "main" activity for this application.  It handles creation and
+ * initialization of all globally shared resources and preparing the questions that
+ * the QuizActivities will use.  It implements a View.OnClickListener so that it
+ * can have a slightly easier time of implementing the transition animations.
+ */
 public class MenuActivity extends Activity implements View.OnClickListener {
-    private static final String TAG = "QuizGame";
-
+    /* References to the global structure and items therein.  These
+     * are globally shared resources.  Handling them like this is
+     * significantly quicker than Parcelizing them in order to pass
+     * among activities (and much easier too).  It's also apparently
+     * the BKM from Google.
+     */
     private Global global;
     private SoundPool soundPool;
     private QuestionDatabase questionDatabase;
-    private QuestionDeck questionDeck;
 
-    /* Resource handles*/
+    /* Resource handles for objects defined in XML */
     private ImageView imageViewQuizLogo;
     private TextView textViewQuizLengthValue;
-
     private TextView textViewQuestionCountValue;
-
     private TextView textViewLastQuizScoreValue;
-    private Button buttonStartQuiz;
-    private Button buttonLessQuestions;
-    private Button buttonMoreQuestions;
-    private Button buttonRemainIndoors;
-    private Button buttonReloadDatabase;
 
     /* Game variables */
     private Integer quizLength;
     private Integer lastQuizScore;
 
-    private int soundsLoaded = 0;
-    private int soundCount = 2;
-
-    private int soundRemainIndoors;
-    private int soundSlideAdvance;
-
+    /* Constants aplenty. */
+    private static final String TAG = "MenuActivity";
     private static final Integer DEFAULT_QUIZ_LENGTH = 10;
     private static final Integer MAX_QUIZ_LENGTH = 20;
-
     private static final String BUNDLE_QUIZ_LENGTH = "net.bradach.jack.quizgame.QUIZ_LENGTH";
     private static final String BUNDLE_QUIZ_SCORE = "net.bradach.jack.quizgame.QUIZ_SCORE";
     private static final String BUNDLE_LAST_QUIZ_SCORE = "net.bradach.jack.quizgame.LAST_QUIZ_SCORE";
 
+    /* Set up activity resources (or restore them after being stopped).  There are
+     * special cases as need be for when we are initializing vs simply being
+     * restored due to orientation change or losing visibility.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        /* If we just popped back from being suspended, snag the previous
+         * values of the game variables.  Otherwise set them to sane defaults.
+         */
         if (savedInstanceState != null) {
             quizLength = savedInstanceState.getInt(BUNDLE_QUIZ_LENGTH);
             lastQuizScore = savedInstanceState.getInt(BUNDLE_LAST_QUIZ_SCORE);
@@ -80,8 +84,6 @@ public class MenuActivity extends Activity implements View.OnClickListener {
         /* Set up our references to any global objects */
         global = Global.getInstance();
 
-
-
         /* Create the QuestionDatabase if it hasn't already been instantiated. */
         if (global.questionDatabase == null) {
             global.questionDatabase = new QuestionDatabase(getApplicationContext());
@@ -91,44 +93,91 @@ public class MenuActivity extends Activity implements View.OnClickListener {
         /* Make sure our quizLength isn't more than we have questions in the database.
          * This is really just a catch that the database has been populated.
          */
-        if (questionDatabase.getQuestionCount() > quizLength) {
+        if (quizLength > questionDatabase.getQuestionCount()) {
             quizLength = questionDatabase.getQuestionCount();
         }
 
-        /* Initialize the sound pool, again if not previously done. */
-        if (global.soundPool == null) {
-            global.soundPool = new SoundPool(2, AudioManager.STREAM_MUSIC, 0);
-            soundSlideAdvance = global.soundPool.load(this, R.raw.sound_slide_advance, 1);
-            soundRemainIndoors = global.soundPool.load(this, R.raw.sound_remain_indoors, 1);
-            global.soundsLoaded = 0;
+        /* Initialize the sound pool and associated structures if not previously done. */
+        if (global.soundMap == null) {
+            global.soundMap = new HashMap<SoundList, Integer>();
         }
 
-        soundPool = global.soundPool;
-        soundsLoaded = global.soundsLoaded;
+        /* Sound effects are handled by a SoundPool object.  If this is the first time
+         * through, one does not exist and we have to create it, load the sounds, and
+         * put the resultant sound IDs into the sound map, so we can easily play them
+         * where they are needed.
+         */
+        if (global.soundPool == null) {
+            int soundId;
+            global.soundsLoadedCount = 0;
+            global.soundsLoaded = false;
+            global.soundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
 
-        /* Callback to count the number of loaded sounds. */
+            /* Load the "Slide Advancing" sound */
+            soundId = global.soundPool.load(this, R.raw.sound_slide_advance, 1);
+            global.soundMap.put(SoundList.SLIDE_ADVANCE, soundId);
+
+            /* Load the "Buzzer" sound */
+            soundId = global.soundPool.load(this, R.raw.sound_buzzer, 1);
+            global.soundMap.put(SoundList.BUZZER, soundId);
+
+            /* Load the "Correct" sound */
+            soundId = global.soundPool.load(this, R.raw.sound_correct, 1);
+            global.soundMap.put(SoundList.CORRECT, soundId);
+
+            /* Load the "Wrong" sound */
+            soundId = global.soundPool.load(this, R.raw.sound_wrong, 1);
+            global.soundMap.put(SoundList.WRONG, soundId);
+
+            /* Load the "Cheat" sound */
+            soundId = global.soundPool.load(this, R.raw.sound_cheat, 1);
+            global.soundMap.put(SoundList.CHEAT, soundId);
+
+            /* Load the "No Cheat" sound */
+            soundId = global.soundPool.load(this, R.raw.sound_nocheat, 1);
+            global.soundMap.put(SoundList.NOCHEAT, soundId);
+
+        }
+        soundPool = global.soundPool;
+
+        /* Set up the media player (for background music) if it's never been
+         * created, load the intro music and start it.  Otherwise, leave it alone.
+         * After the first time the MenuActivity is created, the media player
+         * will be recreated in the onActivityResult callback.
+         */
+        if (global.mediaPlayer == null) {
+            global.mediaPlayer = MediaPlayer.create(this, R.raw.sound_matchgameintro);
+            global.mediaPlayer.setLooping(true);
+            global.mediaPlayer.setVolume(0.5f, 0.5f);
+            global.mediaPlayer.start();
+        }
+
+        /* Callback to count the number of loaded sounds and set a flag when they're
+         * all loaded. Any time a sound is played, it's a good idea to check that flag.
+         * In practice, though, they'll all be loaded by the time any of them are needed.
+         */
         soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
             @Override
             public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
-                global.soundsLoaded++;
+                global.soundsLoadedCount++;
+                if (global.soundsLoadedCount == SoundList.values().length) {
+                    global.soundsLoaded = true;
+                }
             }
         });
-
-
-
 
         /* Match XML resources to the appropriate handles in our object */
         imageViewQuizLogo = (ImageView) findViewById(R.id.imageViewQuizLogo);
         textViewQuizLengthValue = (TextView) findViewById(R.id.textViewQuizLengthValue);
         textViewQuestionCountValue = (TextView) findViewById(R.id.textViewQuestionCountValue);
-
         textViewLastQuizScoreValue = (TextView) findViewById(R.id.textViewLastQuizScoreValue);
 
-        buttonStartQuiz = (Button) findViewById(R.id.buttonStartQuiz);
-        buttonLessQuestions = (Button) findViewById(R.id.buttonLessQuestions);
-        buttonMoreQuestions = (Button) findViewById(R.id.buttonMoreQuestions);
-        buttonRemainIndoors = (Button) findViewById(R.id.buttonRemainIndoors);
-        buttonReloadDatabase = (Button) findViewById(R.id.buttonReloadDatabase);
+        /* The buttons aren't used anywhere else, so they're local to this method. */
+        Button buttonStartQuiz = (Button) findViewById(R.id.buttonStartQuiz);
+        Button buttonLessQuestions = (Button) findViewById(R.id.buttonLessQuestions);
+        Button buttonMoreQuestions = (Button) findViewById(R.id.buttonMoreQuestions);
+        Button buttonRemainIndoors = (Button) findViewById(R.id.buttonRemainIndoors);
+        Button buttonReloadDatabase = (Button) findViewById(R.id.buttonReloadDatabase);
 
         /* Set up listeners */
         buttonStartQuiz.setOnClickListener(this);
@@ -136,15 +185,15 @@ public class MenuActivity extends Activity implements View.OnClickListener {
         buttonMoreQuestions.setOnClickListener(this);
         buttonReloadDatabase.setOnClickListener(this);
 
+        /* Update the on-screen value elements */
         textViewQuestionCountValue.setText((questionDatabase.getQuestionCount()).toString());
         textViewQuizLengthValue.setText(quizLength.toString());
         textViewLastQuizScoreValue.setText(lastQuizScore.toString());
 
-
         /* A handler for the "Remain Indoors" button.  It plays a sound and changes
          * the image for the duration the button is held (hence the onTouchListener rather
-         * than a simple onClick listener).  It's stupid and an obscure reference, but it
-         * amuses me so it stays.
+         * than a simple onClick listener).  It's stupid and a semi-obscure pop-culture
+         * reference, but it amuses me so it stays.
          */
         buttonRemainIndoors.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -153,8 +202,8 @@ public class MenuActivity extends Activity implements View.OnClickListener {
                 switch (motionEvent.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         imageViewQuizLogo.setImageResource(R.drawable.quiz_title_remain_indoors);
-                        if (global.soundsLoaded == soundCount) {
-                            soundPool.play(2, 1, 1, 0, 0, 1);
+                        if (global.soundsLoaded) {
+                            soundPool.play(global.soundMap.get(SoundList.BUZZER), 1, 1, 0, 0, 1);
                         }
                         break;
                     case MotionEvent.ACTION_UP:
@@ -165,15 +214,7 @@ public class MenuActivity extends Activity implements View.OnClickListener {
                 return true;
             }
         });
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.quiz, menu);
-        return true;
-    }
+    } // onCreate
 
     /* The main reason that I'm implementing View.onClickListener here is so I can easily
      * override the transition animation when the 'start quiz' button is clicked.  I handle
@@ -182,7 +223,9 @@ public class MenuActivity extends Activity implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.buttonStartQuiz:
-                /* Sanity check: do we have enough questions in the database? */
+                /* Sanity check: do we have enough questions in the database?  Throw up
+                 * a toast prompting the user to load the database if they haven't already.
+                 */
                 if ((quizLength == 0) || (quizLength > questionDatabase.getQuestionCount())) {
                     CharSequence toastText = getString(R.string.toast_db_not_loaded);
                     Toast toast = Toast.makeText(this, toastText, Toast.LENGTH_SHORT);
@@ -192,10 +235,18 @@ public class MenuActivity extends Activity implements View.OnClickListener {
 
                 /* Create the deck of questions */
                 global.questionDeck = new QuestionDeck();
-                questionDeck = global.questionDeck;
-                questionDeck.createQuiz(quizLength);
+                global.questionDeck.createQuiz(quizLength);
 
-                soundPool.play(soundSlideAdvance, 1, 1, 0, 0, 1);
+                /* Kill the music and set up the one for the quiz */
+                global.mediaPlayer.stop();
+                global.mediaPlayer = MediaPlayer.create(this, R.raw.sound_matchgame);
+                global.mediaPlayer.setVolume(0.5f, 0.5f);
+                global.mediaPlayer.setLooping(true);
+
+                /* Play transition sound clip. */
+                soundPool.play(global.soundMap.get(SoundList.SLIDE_ADVANCE), 1, 1, 0, 0, 1);
+
+                /* Create the new intent and spawn it. */
                 Intent i = new Intent(MenuActivity.this, QuizActivity.class);
                 i.putExtra(BUNDLE_QUIZ_LENGTH, quizLength);
                 i.putExtra(BUNDLE_QUIZ_SCORE, 0);
@@ -203,11 +254,18 @@ public class MenuActivity extends Activity implements View.OnClickListener {
                 this.overridePendingTransition(R.anim.animation_slideleft_newactivity, R.anim.animation_slideleft_oldactivity);
                 break;
 
+            /* Reload the database from the text file resource.  This isn't done automatically
+             * because at some point it might be able to load from a file.
+             */
             case R.id.buttonReloadDatabase:
                 questionDatabase.loadDatabase(getApplicationContext(), R.raw.questions);
                 textViewQuestionCountValue.setText((questionDatabase.getQuestionCount()).toString());
+                /* Reset the default quiz length, since it was probably zero. */
+                quizLength = DEFAULT_QUIZ_LENGTH;
+                textViewQuizLengthValue.setText(quizLength.toString());
                 break;
 
+            /* Reduce the size of the quiz. */
             case R.id.buttonLessQuestions:
                 if (quizLength > 1) {
                     quizLength--;
@@ -215,6 +273,7 @@ public class MenuActivity extends Activity implements View.OnClickListener {
                 }
                 break;
 
+            /* Increase the size of the quiz (up to MAX_QUIZ_LENGTH) */
             case R.id.buttonMoreQuestions:
                 if ((quizLength < questionDatabase.getQuestionCount()) &&
                     (quizLength < MAX_QUIZ_LENGTH)) {
@@ -223,6 +282,24 @@ public class MenuActivity extends Activity implements View.OnClickListener {
                 }
                 break;
 
+        } // switch (v.getId())
+    } // onClick
+
+    /* We're being paused, and so should the music. */
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (global.mediaPlayer.isPlaying()) {
+            global.mediaPlayer.pause();
+        }
+    }
+
+    /* And now?  Back to the show. */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!global.mediaPlayer.isPlaying()) {
+            global.mediaPlayer.start();
         }
     }
 
@@ -233,7 +310,6 @@ public class MenuActivity extends Activity implements View.OnClickListener {
         savedInstanceState.putInt(BUNDLE_QUIZ_LENGTH, quizLength);
         savedInstanceState.putInt(BUNDLE_LAST_QUIZ_SCORE, lastQuizScore);
     }
-
 
     /* Handler for the data passed back to this activity from its children.
      * If the quiz completed, the score is retrieved and the "last quiz score"
@@ -255,6 +331,12 @@ public class MenuActivity extends Activity implements View.OnClickListener {
                 default:
                     Log.w(TAG, "Quiz returned with unknown result code: " + resultCode);
             }
+
+            /* Start the background music back up. */
+            global.mediaPlayer = MediaPlayer.create(this, R.raw.sound_matchgameintro);
+            global.mediaPlayer.setLooping(true);
+            global.mediaPlayer.setVolume(0.5f, 0.5f);
+            global.mediaPlayer.start();
         }
-    }
-}
+    } // onActivityResult
+} // MenuActivity
