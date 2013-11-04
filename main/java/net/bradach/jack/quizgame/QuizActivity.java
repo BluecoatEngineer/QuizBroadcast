@@ -183,7 +183,7 @@ public class QuizActivity extends Activity implements View.OnClickListener {
      * a requirement.  I updated the manifest to reflect this.
      */
     void updateLayout() {
-
+        Log.d(TAG, "updateLayout");
         /* If the question has been answered, use the "special" case. */
         if (quizQuestion.getAttempted()) {
             updateLayoutForAnswered();
@@ -207,7 +207,7 @@ public class QuizActivity extends Activity implements View.OnClickListener {
                 /* If the button was enabled, then we need to 'fade to black' it.  Otherwise,
                  * just set it to be invisible.
                  */
-                if (response.isEnabled()) {
+                if (response.isEnabled() && !quizQuestion.wasSkipped()) {
                     final ObjectAnimator anim = ObjectAnimator.ofFloat(response, "alpha", 1.0f, 0.0f);
 
                     /* A callback for the animator so that we can disable the button once it
@@ -261,6 +261,7 @@ public class QuizActivity extends Activity implements View.OnClickListener {
      * "fix" the button states without them getting animated.
      */
     void updateResponseButtonsAfterRestore() {
+        Log.d(TAG, "updateLayoutAfterRestore");
         for (int i = 0; i < 4; i++ ) {
             Button response = responseButtonList.get(i);
             String responseText = quizQuestion.getResponseText(i);
@@ -270,7 +271,7 @@ public class QuizActivity extends Activity implements View.OnClickListener {
                 response.setEnabled(false);
                 response.setVisibility(View.INVISIBLE);
             } else {
-                /* Button is visable */
+                /* Button is visible */
                 response.setText(responseText);
                 response.setVisibility(View.VISIBLE);
             }
@@ -405,7 +406,8 @@ public class QuizActivity extends Activity implements View.OnClickListener {
                     finish();
                     this.overridePendingTransition(R.anim.animation_slideright_newactivity, R.anim.animation_slideright_oldactivity);
                 } else {
-                    /* queue up the next question. */
+                    /* Mark question as skipped and queue up the next question. */
+                    quizQuestion.setSkipped();
                     questionDeck.getNextQuestion();
                     Intent nextQuiz = new Intent(QuizActivity.this, QuizActivity.class);
                     nextQuiz.putExtra(BUNDLE_QUIZ_LENGTH, quizLength);

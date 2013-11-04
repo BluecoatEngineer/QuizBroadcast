@@ -95,9 +95,10 @@
 
                     android:textColor="#ffffff"
                     android:height="64dp"
-                    android:layout_alignParentTop="true"
+                    android:layout_alignParentTop="false"
                     android:layout_alignParentLeft="true"
-                    android:width="128dp" />
+                    android:width="128dp"
+                    android:layout_alignParentBottom="true" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -131,9 +132,10 @@
 
                     android:textColor="#ffffff"
                     android:height="64dp"
-                    android:layout_alignParentTop="true"
+                    android:layout_alignParentTop="false"
                     android:layout_alignParentRight="true"
-                    android:width="128dp" />
+                    android:width="128dp"
+                    android:layout_alignTop="@+id/buttonHint" />
             </RelativeLayout>
 
         </LinearLayout>

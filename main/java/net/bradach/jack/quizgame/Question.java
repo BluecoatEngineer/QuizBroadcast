@@ -18,6 +18,9 @@ public class Question {
     /* Whether or not this question has been attempted. */
     private boolean attempted = false;
 
+    /* Whether or not we have been previously skipped. */
+    private boolean skipped = false;
+
     /* The answer the user provided when they attempted the question. */
     private Integer response = -1;
 
@@ -210,4 +213,10 @@ public class Question {
     public void setResponse(Integer response) {
         this.response = response;
     }
+
+    /* Accessor to check if this question was skipped. */
+    public Boolean wasSkipped() { return skipped; }
+
+    /* Mutator to mark this question as having been skipped. */
+    void setSkipped() { skipped = true; }
 }
