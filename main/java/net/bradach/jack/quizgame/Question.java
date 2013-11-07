@@ -30,7 +30,7 @@ public class Question {
     /* How many times the user has 'cheated' on this question. */
     private Integer cheatCount = 0;
 
-    /* Array of Hashmaps,each containing a the type of response
+    /* Array of HashMaps,each containing a the type of response
      * and the text that goes along with it.  The array wraps the
      * HashMap because HashMaps are unordered;  I needed a way to
      * be able to match a response to a specific element.

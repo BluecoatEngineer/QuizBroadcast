@@ -167,7 +167,7 @@ public class QuizActivity extends Activity implements View.OnClickListener {
             if (quizQuestion.getAttempted()) {
                 updateLayoutForAnswered();
             } else {
-                updateResponseButtonsAfterRestore();
+                updateLayoutAfterRestore();
             }
         } else {
             updateLayout();
@@ -182,7 +182,7 @@ public class QuizActivity extends Activity implements View.OnClickListener {
      * require API >= 11 in order to work, meaning that Honeycomb is
      * a requirement.  I updated the manifest to reflect this.
      */
-    void updateLayout() {
+    private void updateLayout() {
         Log.d(TAG, "updateLayout");
         /* If the question has been answered, use the "special" case. */
         if (quizQuestion.getAttempted()) {
@@ -260,7 +260,7 @@ public class QuizActivity extends Activity implements View.OnClickListener {
     /* After a restore / orientation change, this function gets called to quickly
      * "fix" the button states without them getting animated.
      */
-    void updateResponseButtonsAfterRestore() {
+    private void updateLayoutAfterRestore() {
         Log.d(TAG, "updateLayoutAfterRestore");
         for (int i = 0; i < 4; i++ ) {
             Button response = responseButtonList.get(i);
@@ -342,7 +342,7 @@ public class QuizActivity extends Activity implements View.OnClickListener {
      * buttons except for next/end.  Also, the correct (and possibly incorrect)
      * responses are highlighted.
      */
-    void updateLayoutForAnswered() {
+    private void updateLayoutForAnswered() {
         Integer responseNum = quizQuestion.getResponse();
 
         /* Can't cheat on an answered question. */

@@ -7,7 +7,7 @@ import java.util.Iterator;
  * Holds the deck of questions for the current quiz and talks to the
  * question database to populate itself when needed.
  */
-final public class QuestionDeck {
+final public class  QuestionDeck {
     private static final String TAG = "QuestionDeck";
     private final QuestionDatabase questionDatabase;
 
